@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#123b48">
+  <meta name="description" content="BudgetZen FCFA : gérez vos revenus, dépenses, provisions et objectifs d’épargne.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <title>BudgetZen FCFA</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="BudgetZen accueil"><span class="brand-mark">B</span><span>Budget<span class="brand-accent">Zen</span><small>FCFA · Mon budget serein</small></span></a>
+      <div class="header-actions">
+        <button class="icon-btn" id="installBtn" hidden title="Installer l’application">＋ <span>Installer</span></button>
+        <button class="icon-btn" id="exportBtn" title="Exporter une sauvegarde">⇩ <span>Sauvegarder</span></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="welcome-row">
+        <div><p class="eyebrow" id="todayLabel">VOTRE ESPACE FINANCIER</p><h1>Bonjour 👋</h1><p class="subtext">Chaque franc a sa place.</p></div>
+        <label class="month-picker"><span>Mois</span><input type="month" id="monthPicker"></label>
+      </section>
+
+      <section class="balance-card">
+        <div class="balance-head"><span>Solde disponible estimé</span><span class="live-dot">● En direct</span></div>
+        <div class="balance-value" id="availableBalance">0 <small>FCFA</small></div>
+        <p class="balance-note">Revenus − dépenses − provisions réservées − épargne affectée</p>
+        <div class="balance-grid">
+          <div><span>Revenus</span><strong id="incomeTotal">0 FCFA</strong></div>
+          <div><span>Dépenses</span><strong id="expenseTotal">0 FCFA</strong></div>
+          <div><span>Provisions réservées</span><strong id="provisionTotal">0 FCFA</strong></div>
+          <div><span>Épargne affectée</span><strong id="savingsTotal">0 FCFA</strong></div>
+        </div>
+      </section>
+
+      <section class="quick-actions" aria-label="Actions rapides">
+        <button class="action action-primary" data-open="expense"><span class="action-icon">−</span><span><strong>Ajouter une dépense</strong><small>Enregistrer un achat ou paiement</small></span></button>
+        <button class="action action-secondary" data-open="income"><span class="action-icon">＋</span><span><strong>Ajouter un revenu</strong><small>Salaire, commerce, autre source</small></span></button>
+      </section>
+
+      <nav class="tabs" aria-label="Navigation principale">
+        <button class="tab active" data-tab="dashboard">Vue d’ensemble</button>
+        <button class="tab" data-tab="transactions">Opérations</button>
+        <button class="tab" data-tab="budget">Mon budget</button>
+        <button class="tab" data-tab="goals">Épargne</button>
+      </nav>
+
+      <section class="view" id="view-dashboard">
+        <div class="section-heading"><div><p class="eyebrow">RÉPARTITION</p><h2>Budget par catégorie</h2></div><button class="text-button" data-tab-link="budget">Modifier</button></div>
+        <div id="categorySummary" class="category-list"></div>
+        <div class="section-heading"><div><p class="eyebrow">TENDANCE</p><h2>Dépenses du mois</h2></div><span class="muted" id="chartCaption">FCFA</span></div>
+        <div class="panel"><div id="monthlyChart" class="chart" aria-label="Graphique des dépenses par semaine"></div><div class="chart-legend"><span><i></i> Dépenses enregistrées par semaine</span></div></div>
+        <div class="section-heading"><div><p class="eyebrow">RÉCENT</p><h2>Dernières opérations</h2></div><button class="text-button" data-tab-link="transactions">Tout voir</button></div>
+        <div class="panel" id="recentTransactions"></div>
+        <div id="budgetAlerts"></div>
+      </section>
+
+      <section class="view hidden" id="view-transactions">
+        <div class="section-heading"><div><p class="eyebrow">HISTORIQUE</p><h2>Opérations du mois</h2></div><button class="text-button" id="clearMonthBtn">Effacer le mois</button></div>
+        <div class="filter-row"><input id="searchTransactions" type="search" placeholder="Rechercher une opération…"><select id="typeFilter"><option value="all">Tout</option><option value="expense">Dépenses</option><option value="income">Revenus</option></select></div>
+        <div class="panel" id="allTransactions"></div>
+      </section>
+
+      <section class="view hidden" id="view-budget">
+        <div class="section-heading"><div><p class="eyebrow">PLANIFICATION</p><h2>Prévoir son mois</h2></div></div>
+        <p class="subtext section-intro">Définissez des plafonds réalistes. Les provisions sont des montants à réserver pour vos besoins, même si vous ne les avez pas encore dépensés.</p>
+        <form id="budgetForm" class="panel budget-form"><div id="budgetFields"></div><button class="button-primary" type="submit">Enregistrer mes plafonds</button></form>
+        <div class="panel info-panel"><strong>À retenir</strong><p>Les plafonds servent à suivre vos dépenses et alertes. Le solde disponible déduit les provisions prévues ainsi que l’épargne affectée : il ne déduit pas une deuxième fois les dépenses déjà enregistrées.</p></div>
+      </section>
+
+      <section class="view hidden" id="view-goals">
+        <div class="section-heading"><div><p class="eyebrow">PROJETS</p><h2>Objectifs d’épargne</h2></div></div>
+        <form id="goalForm" class="panel goal-form">
+          <h3>Créer un objectif</h3>
+          <label>Nom de l’objectif<input id="goalName" required maxlength="70" placeholder="Ex. Fonds d’urgence"></label>
+          <div class="two-fields"><label>Montant cible (FCFA)<input id="goalTarget" required type="number" min="1" step="1" placeholder="300000"></label><label>Déjà épargné (FCFA)<input id="goalCurrent" type="number" min="0" step="1" value="0"></label></div>
+          <button class="button-primary" type="submit">＋ Ajouter l’objectif</button>
+        </form>
+        <div id="goalList" class="goal-list"></div>
+      </section>
+    </main>
+
+    <footer class="app-footer"><span>BudgetZen FCFA</span><span>Vos données restent sur cet appareil.</span><button id="importBtn" class="text-button">Restaurer une sauvegarde</button><input type="file" id="importFile" accept="application/json" hidden></footer>
+  </div>
+
+  <dialog id="transactionDialog" class="dialog">
+    <form id="transactionForm" method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow" id="dialogEyebrow">OPÉRATION</p><h2 id="dialogTitle">Ajouter une dépense</h2></div><button type="button" class="close-btn" id="closeDialog" aria-label="Fermer">×</button></div>
+      <label>Libellé<input id="txLabel" required maxlength="100" placeholder="Ex. Courses du marché"></label>
+      <div class="two-fields"><label>Montant (FCFA)<input id="txAmount" required type="number" min="1" step="1" inputmode="numeric" placeholder="15000"></label><label>Catégorie<select id="txCategory" required></select></label></div>
+      <div class="two-fields"><label>Date<input id="txDate" type="date" required></label><label>Source / paiement<select id="txSource"><option>Espèces</option><option>Orange Money</option><option>MTN MoMo</option><option>Wave</option><option>Virement bancaire</option><option>Autre</option></select></label></div>
+      <label>Note (facultatif)<input id="txNote" maxlength="160" placeholder="Un détail à retenir"></label>
+      <button class="button-primary full-width" type="submit">Enregistrer l’opération</button>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
